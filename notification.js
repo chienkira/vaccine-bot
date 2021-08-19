@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const axios = require('axios');
 
 const options = {
   headless: !process.env.DEBUG,
@@ -56,4 +57,14 @@ module.exports.sendMessage = async (page, recipientId, message) => {
   await page.$eval(SELECTOR.sendButton, elem => elem.click());
   console.debug(`sent "${message}" to #${recipientId}`);
   await sleep(500);
+}
+
+module.exports.sendSlack = async (message) => {
+  const payload = {
+    text: message
+  }
+  const webhookUrl = process.env.SLACK_HOOK;
+  const res = await axios.post(webhookUrl, JSON.stringify(payload));
+  console.debug(`sent "${message}" to Slack`);
+  return res.data;
 }

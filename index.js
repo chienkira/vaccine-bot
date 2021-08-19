@@ -4,7 +4,7 @@ console.logLevel = 4; // All logs
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const axios = require('axios');
-const { startBrowser, login, sendMessage } = require('./notification');
+const { startBrowser, login, sendMessage, sendSlack } = require('./notification');
 
 const options = {
   vaccineId:        process.env.DEBUG ? process.env.DEBUG_VACCINE_ID : process.env.VACCINE_ID,
@@ -27,11 +27,14 @@ const main = async (argv) => {
     console.debug(data);
 
     if (data.code === '200' && data.message === 'Authentication failed') {
-      console.debug(`vaccine login NOT available`)
+      console.debug(`vaccine login NOT available`);
       return false;
     }
 
-    console.debug(`vaccine login IS available!`)
+    console.debug(`vaccine login IS available!`);
+    // notify to Slack
+    await sendSlack(`🎉 Bắt đầu đăng nhập vào để book tiêm vaccine được rồi 🎉`);
+    // notify to Messenger
     const { browser, page } = await startBrowser();
     await login(page);
     await sendMessage(page, options.notifyRecipient, `[Debug] Login response: ${JSON.stringify({...data, refresh: '***', access: '***'})}`);
@@ -40,6 +43,7 @@ const main = async (argv) => {
     await browser.close();
   })
   .catch(async function (error) {
+    await sendSlack(`Vaccine bot error: ${error.message}`);
     console.error(error.message);
     console.error(error);
   });
