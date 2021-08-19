@@ -13,6 +13,7 @@ const options = {
 }
 
 const main = async (argv) => {
+  console.debug("\n")
   console.debug(`check vaccine login availability`)
   axios({
     method: 'post', url: 'https://api.vaccines.sciseed.jp/public/111007/login/',
@@ -23,7 +24,7 @@ const main = async (argv) => {
       password: options.vaccinePass,
     },
   }).then(async function (response) {
-    const data = response.data;
+    const data = { ...data, refresh: '***', access: '***' };
     console.debug(data);
 
     if (data.code === '200' && data.message === 'Authentication failed') {
@@ -33,19 +34,20 @@ const main = async (argv) => {
 
     console.debug(`vaccine login IS available!`);
     // notify to Slack
+    await sendSlack(`[Debug] Login response: ${JSON.stringify(data)}`);
     await sendSlack(`🎉 Bắt đầu đăng nhập vào để book tiêm vaccine được rồi 🎉`);
     // notify to Messenger
     const { browser, page } = await startBrowser();
     await login(page);
-    await sendMessage(page, options.notifyRecipient, `[Debug] Login response: ${JSON.stringify({...data, refresh: '***', access: '***'})}`);
+    await sendMessage(page, options.notifyRecipient, `[Debug] Login response: ${JSON.stringify(data)}`);
     await sendMessage(page, options.notifyRecipient, `🎉 Bắt đầu đăng nhập vào để book tiêm vaccine được rồi 🎉`);
     await sendMessage(page, options.notifyRecipient, `Link trang đăng nhập: https://vaccines.sciseed.jp/saitama-city-vt/login`);
     await browser.close();
   })
   .catch(async function (error) {
     await sendSlack(`Vaccine bot error: ${error.message}`);
-    console.error(error.message);
-    console.error(error);
+    console.log(error.message);
+    console.log(error);
   });
 }
 require.main === module && main(process.argv);
