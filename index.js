@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 require('better-logging')(console, { format: ctx => `${ctx.date}${ctx.time24} ${ctx.type} ${ctx.msg}` });
 console.logLevel = 4; // All logs
-require('dotenv').config()
+require('dotenv').config({ path: __dirname + '/.env' });
 
 const axios = require('axios');
 const { startBrowser, login, sendMessage } = require('./notification');
