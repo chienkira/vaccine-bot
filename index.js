@@ -13,7 +13,7 @@ const options = {
 }
 
 const main = async (argv) => {
-  console.debug("\n")
+  console.debug(``)
   console.debug(`check vaccine login availability`)
   axios({
     method: 'post', url: 'https://api.vaccines.sciseed.jp/public/111007/login/',
@@ -24,9 +24,8 @@ const main = async (argv) => {
       password: options.vaccinePass,
     },
   }).then(async function (response) {
-    const data = { ...data, refresh: '***', access: '***' };
-    console.debug(data);
-
+    console.debug(response.data);
+    const data = { ...response.data, refresh: '***', access: '***' };
     if (data.code === '200' && data.message === 'Authentication failed') {
       console.debug(`vaccine login NOT available`);
       return false;
