@@ -5,6 +5,7 @@ require('dotenv').config({ path: __dirname + '/.env' });
 
 const axios = require('axios');
 const { startBrowser, login, sendMessage, sendSlack } = require('./notification');
+const fs = require('fs');
 
 const options = {
   vaccineId:        process.env.DEBUG ? process.env.DEBUG_VACCINE_ID : process.env.VACCINE_ID,
@@ -15,6 +16,12 @@ const options = {
 const main = async (argv) => {
   console.debug(``)
   console.debug(`check vaccine login availability`)
+
+  if (fs.existsSync('STOP_CHECK')) {
+    console.debug(`skip checking!`);
+    return false;
+  }
+
   axios({
     method: 'post', url: 'https://api.vaccines.sciseed.jp/public/111007/login/',
     headers: { "content-type": "application/json;charset=UTF-8" },
@@ -32,6 +39,8 @@ const main = async (argv) => {
     }
 
     console.debug(`vaccine login IS available!`);
+    // touch new file to store check result
+    fs.closeSync(fs.openSync('STOP_CHECK', 'w'));
     // notify to Slack
     await sendSlack(`[Debug] Login response: ${JSON.stringify(data)}`);
     await sendSlack(`🎉 Bắt đầu đăng nhập vào để book tiêm vaccine được rồi 🎉`);
