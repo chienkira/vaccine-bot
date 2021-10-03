@@ -17,7 +17,7 @@ const main = async (argv) => {
   console.debug(``)
   console.debug(`check vaccine login availability`)
 
-  if (fs.existsSync('STOP_CHECK')) {
+  if (fs.existsSync('/tmp/STOP_CHECK_VACCINE')) {
     console.debug(`skip checking!`);
     return false;
   }
@@ -40,7 +40,7 @@ const main = async (argv) => {
 
     console.debug(`vaccine login IS available!`);
     // touch new file to store check result
-    fs.closeSync(fs.openSync('STOP_CHECK', 'w'));
+    fs.closeSync(fs.openSync('/tmp/STOP_CHECK_VACCINE', 'w'));
     // notify to Slack
     await sendSlack(`[Debug] Login response: ${JSON.stringify(data)}`);
     await sendSlack(`🎉 Bắt đầu đăng nhập vào để book tiêm vaccine được rồi 🎉`);
