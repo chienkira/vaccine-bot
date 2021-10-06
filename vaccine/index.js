@@ -4,7 +4,7 @@ console.logLevel = 4; // All logs
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const axios = require('axios');
-const { startBrowser, login, sendMessage, sendSlack } = require('./notification');
+const { startBrowser, login, sendMessage, sendSlack } = require('../notification');
 const fs = require('fs');
 
 const options = {
